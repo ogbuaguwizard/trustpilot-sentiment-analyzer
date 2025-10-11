@@ -12,7 +12,7 @@ import random
 # -------------------------------
 # Must be FIRST Streamlit call
 # -------------------------------
-st.set_page_config(page_title="Trustpilot ABSA Analyzer", page_icon="💬", layout="wide")
+st.set_page_config(page_title="Trustpilot ABSA Analyzer", page_icon="💬", layout="centered")
 
 # ---------- NLTK setup ----------
 def ensure_nltk_data():
@@ -56,7 +56,7 @@ def get_sentiment_label(score):
 
 def analyze_aspects(df):
     aspect_sentiments = defaultdict(list)
-    aspect_table = []  # per-review display
+    aspect_table = []
 
     for _, row in df.iterrows():
         pairs = extract_aspects_and_opinions(row["review"])
@@ -69,7 +69,6 @@ def analyze_aspects(df):
             pair_list.append((aspect, opinion, label))
         aspect_table.append(pair_list)
 
-    # Aggregate summary
     summary = []
     for a, sents in aspect_sentiments.items():
         pos, neu, neg = sents.count("positive"), sents.count("neutral"), sents.count("negative")
@@ -138,13 +137,20 @@ if st.button("🚀 Analyze"):
         # ---------- Aspect Table per Review ----------
         st.subheader("🧩 Aspects & Opinions (Per Review)")
 
-        # User control
         num_reviews = st.slider("Select how many random reviews to show:", 1, min(10, len(df)), 5)
         selected_indices = random.sample(range(len(df)), num_reviews)
 
         for i, idx in enumerate(selected_indices, 1):
             row = df.iloc[idx]
-            st.markdown(f"**Review {idx+1}:** “{row.review}”")
+            st.markdown(
+                f"""
+                <div style='background-color:#f8f9fa;padding:16px;margin:12px 0;
+                            border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.1);'>
+                    <div style='font-weight:600;margin-bottom:8px;'>Review {idx+1}</div>
+                    <div style='font-style:italic;margin-bottom:10px;'>{row.review}</div>
+                """,
+                unsafe_allow_html=True,
+            )
 
             pairs = aspect_table[idx]
             if not pairs:
@@ -153,16 +159,25 @@ if st.button("🚀 Analyze"):
                 html_pairs = ""
                 for asp, op, lab in pairs:
                     bg_color = {"positive": "#4CAF50", "neutral": "#999", "negative": "#E74C3C"}[lab]
-                    html_pairs += f"<div style='display:inline-block; margin:4px 8px; padding:4px 8px; border-radius:6px; background:{bg_color}; color:white; font-weight:500;'>{asp} {op}</div>"
+                    html_pairs += f"""
+                        <div style='display:flex;align-items:center;margin:6px 0;'>
+                            <div style='font-weight:600;margin-right:6px;'>{asp}:</div>
+                            <div style='background:{bg_color};color:white;
+                                        border-radius:8px;padding:4px 10px;font-weight:500;'>
+                                {op}
+                            </div>
+                        </div>
+                    """
                 st.markdown(html_pairs, unsafe_allow_html=True)
-            st.markdown("<hr>", unsafe_allow_html=True)
+
+            st.markdown("</div>", unsafe_allow_html=True)  # close card
 
         # ---------- Pie chart ----------
         st.subheader("📊 Sentiment Distribution")
         labels = ["Positive", "Neutral", "Negative"]
         sizes = [aspect_df["Positive"].sum(), aspect_df["Neutral"].sum(), aspect_df["Negative"].sum()]
-        fig, ax = plt.subplots()
-        ax.pie(sizes, labels=labels, autopct="%1.1f%%", startangle=90)
+        fig, ax = plt.subplots(figsize=(3, 3))
+        ax.pie(sizes, labels=labels, autopct="%1.1f%%", startangle=90, textprops={"fontsize": 8})
         st.pyplot(fig)
 
         # ---------- Overall sentiment ----------
@@ -172,8 +187,10 @@ if st.button("🚀 Analyze"):
         overall = "positive" if score > 0.05 else "negative" if score < -0.05 else "neutral"
         color = {"positive": "#4CAF50", "neutral": "#95A5A6", "negative": "#E74C3C"}[overall]
         emoji = {"positive": "😊", "neutral": "😐", "negative": "😞"}[overall]
+
         st.markdown(
-            f"<div style='text-align:center;padding:20px;border-radius:12px;background:{color};color:white;'>"
+            f"<div style='text-align:center;padding:20px;border-radius:12px;"
+            f"background:{color};color:white;max-width:400px;margin:auto;'>"
             f"<b>OVERALL SENTIMENT: {overall.upper()} {emoji}</b><br>(Score {score:.2f})</div>",
             unsafe_allow_html=True,
         )
