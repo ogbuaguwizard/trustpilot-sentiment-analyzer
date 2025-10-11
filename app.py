@@ -24,7 +24,9 @@ def ensure_nltk_data():
             nltk.download('punkt_tab')
             nltk.download('averaged_perceptron_tagger')
             nltk.download('averaged_perceptron_tagger_eng')
+            nltk.download('brown')
             nltk.download('wordnet')
+            nltk.download('movie_reviews')
 
 ensure_nltk_data()
 
