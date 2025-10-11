@@ -192,7 +192,7 @@ if 'aspect_df' in st.session_state:
     
     # Set chart labels to white
     ax.pie(sizes, labels=labels, autopct="%1.1f%%", startangle=20, 
-           textprops={"fontsize": 5, "color": "blue"})
+           textprops={"fontsize": 5, "color": "black"})
     st.pyplot(fig)
 
     # ---------- Overall sentiment ----------
