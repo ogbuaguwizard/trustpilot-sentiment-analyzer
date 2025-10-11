@@ -191,8 +191,8 @@ if 'aspect_df' in st.session_state:
     ax.set_facecolor("none")
     
     # Set chart labels to white
-    ax.pie(sizes, labels=labels, autopct="%1.1f%%", startangle=40, 
-           textprops={"fontsize": 6, "color": "white"})
+    ax.pie(sizes, labels=labels, autopct="%1.1f%%", startangle=20, 
+           textprops={"fontsize": 5, "color": "white"})
     st.pyplot(fig)
 
     # ---------- Overall sentiment ----------
