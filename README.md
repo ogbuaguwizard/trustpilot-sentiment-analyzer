@@ -1,28 +1,34 @@
 # 🌐 Trustpilot Sentiment Analyzer  
-### Real-Time Opinion Mining and Aspect-Based Sentiment Analysis (ABSA) App
+### Real-Time Opinion Mining and Aspect-Based Sentiment Analysis (ABSA) App  
+
+🔗 **Live App:** [https://website-sentiment-analyzer.streamlit.app/](https://website-sentiment-analyzer.streamlit.app/)  
+💻 **GitHub Repository:** [https://github.com/ogbuaguwizard/trustpilot-sentiment-analyzer/](https://github.com/ogbuaguwizard/trustpilot-sentiment-analyzer/)
 
 ---
 
-## 📖 Overview
+## 📖 Overview  
 
-This project is a **Streamlit-based web application** that scrapes **Trustpilot reviews** for any website (e.g., `facebook.com`, `airbnb.com`) and performs **real-time sentiment analysis** and **aspect-based review summarization (ABSA)**.
+The **Trustpilot Sentiment Analyzer** is a **Streamlit-based ABSA (Aspect-Based Sentiment Analysis)** web application that scrapes and analyzes **Trustpilot reviews** for any website (e.g., `facebook.com`, `airbnb.com`).  
 
-It was developed as part of a study aimed at designing a comprehensive framework for **website evaluation using opinion mining techniques** for accurate, real-time, and scalable feedback analysis.
+It performs **real-time opinion mining** and extracts **key aspects** (topics) with their associated sentiments, helping to evaluate websites based on genuine user feedback.  
 
----
-
-## 🚀 Features
-
-✅ **Real-time scraping** — fetches multiple Trustpilot pages until no more reviews are found.  
-✅ **Sentiment Analysis** — uses `TextBlob` to classify each review as *positive*, *negative*, or *neutral*.  
-✅ **Aspect Extraction (ABSA)** — identifies frequent nouns (topics) discussed in reviews.  
-✅ **Visual Charts** — displays sentiment distribution using Matplotlib.  
-✅ **Final Summary** — produces an overall website sentiment rating.  
-✅ **Streamlit UI** — users can simply enter a website domain and view analysis instantly.
+This project is part of a broader study focused on **designing a comprehensive framework for website evaluation using opinion mining techniques**, ensuring **accuracy**, **real-time adaptability**, and **scalable insights**.
 
 ---
 
-## 🧠 Core Technologies
+## 🚀 Features  
+
+✅ **Real-time scraping** — Automatically fetches multiple Trustpilot review pages until no more reviews are available.  
+✅ **Aspect-based opinion mining (ABSA)** — Identifies key aspects (nouns) and associated opinions (adjectives). 
+✅ **Sentiment analysis** — Classifies each pair into *positive*, *neutral*, or *negative* using TextBlob.
+✅ **Interactive Streamlit UI** — Simple input for website domain, real-time results, and dynamic controls.  
+✅ **Color-coded sentiment boxes** — Easy visualization of extracted opinions.  
+✅ **Visual insights** — Pie chart of sentiment distribution with clean, white-labeled charts.  
+✅ **Overall sentiment summary** — Combines analysis results into an intuitive rating summary.
+
+---
+
+## 🧠 Core Technologies  
 
 | Category | Libraries/Tools |
 |-----------|----------------|
@@ -31,19 +37,23 @@ It was developed as part of a study aimed at designing a comprehensive framework
 | **Data Processing** | Pandas |
 | **Sentiment Analysis** | TextBlob, NLTK |
 | **Visualization** | Matplotlib |
-| **ABSA (Aspect Mining)** | TextBlob POS tagging |
+| **Aspect Mining (ABSA)** | POS tagging via NLTK and TextBlob |
 
 ---
 
-## ⚙️ Installation
+## ⚙️ Installation  
 
-Clone this repository and install the required dependencies:
+To set up the app locally:  
 
 ```bash
-git clone https://github.com/<your-username>/trustpilot-sentiment-analyzer.git
+# Clone the repository
+git clone https://github.com/ogbuaguwizard/trustpilot-sentiment-analyzer.git
 cd trustpilot-sentiment-analyzer
+
+# Install dependencies
 pip install -r requirements.txt
 ```
+
 Running the App
 ```bash
 streamlit run app.py
