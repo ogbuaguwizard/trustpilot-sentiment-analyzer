@@ -17,6 +17,8 @@ st.set_page_config(page_title="Trustpilot ABSA Analyzer", page_icon="💬", layo
 # ---------- NLTK setup ----------
 def ensure_nltk_data():
     try:
+        nltk.data.find('tokenizers/punkt')
+        nltk.data.find('tokenizers/punkt_tab')
         nltk.data.find('taggers/averaged_perceptron_tagger_eng')
     except LookupError:
         with st.spinner("🔄 Setting up NLP data..."):
