@@ -9,6 +9,8 @@ import nltk
 import time
 import re
 
+st.set_page_config(page_title="Trustpilot Sentiment Analyzer", page_icon="💬", layout="wide")
+
 # Ensure necessary NLTK data
 def ensure_nltk_data():
     try:
@@ -99,8 +101,6 @@ def scrape_trustpilot(domain):
 # ======================
 # STREAMLIT UI
 # ======================
-st.set_page_config(page_title="Trustpilot Sentiment Analyzer", page_icon="💬", layout="wide")
-
 st.title("💬 Trustpilot Review Sentiment Analyzer")
 st.write("Enter a domain (e.g. `facebook.com`, `www.amazon.com`) to scrape and analyze recent Trustpilot reviews in real time.")
 
