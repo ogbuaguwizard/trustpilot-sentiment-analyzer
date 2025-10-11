@@ -43,3 +43,15 @@ Clone this repository and install the required dependencies:
 git clone https://github.com/<your-username>/trustpilot-sentiment-analyzer.git
 cd trustpilot-sentiment-analyzer
 pip install -r requirements.txt
+```
+Running the App
+```bash
+streamlit run app.py
+```
+
+Project Structure
+trustpilot-sentiment-analyzer/
+│
+├── app.py
+├── requirements.txt
+└── README.md
