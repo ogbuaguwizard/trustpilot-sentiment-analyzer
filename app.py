@@ -178,7 +178,7 @@ if 'aspect_df' in st.session_state:
                     font-size: 0.9em;
                 '>{opinion}</span>
                 """
-                colored_boxes.append(f"{aspect} {box_html}")
+                colored_boxes.append(f"{aspect} {box_html},")
             
             st.markdown("**Aspects & Opinions:** " + " ".join(colored_boxes), unsafe_allow_html=True)
 
@@ -186,13 +186,13 @@ if 'aspect_df' in st.session_state:
     st.subheader("📊 Sentiment Distribution")
     labels = ["Positive", "Neutral", "Negative"]
     sizes = [aspect_df["Positive"].sum(), aspect_df["Neutral"].sum(), aspect_df["Negative"].sum()]
-    fig, ax = plt.subplots(figsize=(3, 3))
+    fig, ax = plt.subplots(figsize=(2, 2))
     fig.patch.set_alpha(0.0)  # transparent background
     ax.set_facecolor("none")
     
     # Set chart labels to white
     ax.pie(sizes, labels=labels, autopct="%1.1f%%", startangle=90, 
-           textprops={"fontsize": 8, "color": "white"})
+           textprops={"fontsize": 6, "color": "white"})
     st.pyplot(fig)
 
     # ---------- Overall sentiment ----------
@@ -201,11 +201,10 @@ if 'aspect_df' in st.session_state:
     score = (pos - neg) / total if total else 0
     overall = "positive" if score > 0.05 else "negative" if score < -0.05 else "neutral"
     color = {"positive": "#4CAF50", "neutral": "#95A5A6", "negative": "#E74C3C"}[overall]
-    emoji = {"positive": "😊", "neutral": "😐", "negative": "😞"}[overall]
 
     st.markdown(
         f"<div style='text-align:center;padding:16px;border-radius:8px;"
         f"background:{color};color:white;max-width:400px;margin:auto;'>"
-        f"<b>OVERALL SENTIMENT: {overall.upper()} {emoji}</b><br>(Score {score:.2f})</div>",
+        f"<b>OVERALL SENTIMENT: {overall.upper()}</b><br>(Score {score:.2f})</div>",
         unsafe_allow_html=True,
     )
