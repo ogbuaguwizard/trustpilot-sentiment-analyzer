@@ -49,9 +49,5 @@ Running the App
 streamlit run app.py
 ```
 
-Project Structure
-trustpilot-sentiment-analyzer/
-│
-├── app.py
-├── requirements.txt
-└── README.md
+Citation (if used in research)
+Ogbuagu, F. K. (2025). Design and Implementation of a Comprehensive Framework for Website Evaluation Using Opinion Mining Techniques.
