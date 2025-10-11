@@ -21,6 +21,7 @@ def ensure_nltk_data():
     except LookupError:
         with st.spinner("🔄 Setting up NLP data..."):
             nltk.download('punkt')
+            nltk.download('punkt_tab')
             nltk.download('averaged_perceptron_tagger')
             nltk.download('averaged_perceptron_tagger_eng')
             nltk.download('wordnet')
