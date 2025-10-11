@@ -3,13 +3,13 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import matplotlib.pyplot as plt
-from collections import Counter
+from collections import Counter, defaultdict
 from textblob import TextBlob
 import nltk
 import time
 import re
 
-st.set_page_config(page_title="Trustpilot Sentiment Analyzer", page_icon="💬", layout="wide")
+st.set_page_config(page_title="Trustpilot ABSA Analyzer", page_icon="💬", layout="wide")
 
 # Ensure necessary NLTK data
 def ensure_nltk_data():
@@ -28,22 +28,63 @@ def ensure_nltk_data():
 ensure_nltk_data()
 
 # ======================
-# Sentiment & Aspect Functions
+# Aspect + Sentiment Functions
 # ======================
-def get_sentiment(text):
-    blob = TextBlob(text)
-    score = blob.sentiment.polarity
-    if score > 0.1:
-        return "positive", score
-    elif score < -0.1:
-        return "negative", score
-    else:
-        return "neutral", score
+def extract_aspects_and_opinions(text):
+    tokens = nltk.word_tokenize(text)
+    tagged = nltk.pos_tag(tokens)
 
-def extract_aspects(text):
-    blob = TextBlob(text)
-    nouns = [word.lower() for word, tag in blob.tags if tag.startswith("NN")]
-    return nouns
+    aspects_opinions = []
+    for i, (word, tag) in enumerate(tagged):
+        if tag.startswith("NN"):  # noun = aspect
+            # Check nearby adjectives (opinions)
+            left_adj = tagged[i-1][0] if i > 0 and tagged[i-1][1].startswith("JJ") else None
+            right_adj = tagged[i+1][0] if i < len(tagged)-1 and tagged[i+1][1].startswith("JJ") else None
+            opinion = left_adj or right_adj
+            if opinion:
+                aspects_opinions.append((word.lower(), opinion.lower()))
+    return aspects_opinions
+
+
+def get_sentiment_label(score):
+    if score > 0.1:
+        return "positive"
+    elif score < -0.1:
+        return "negative"
+    else:
+        return "neutral"
+
+
+def analyze_aspects(df):
+    aspect_sentiments = defaultdict(list)
+
+    for review in df["review"]:
+        pairs = extract_aspects_and_opinions(review)
+        for aspect, opinion in pairs:
+            blob = TextBlob(opinion)
+            sentiment_score = blob.sentiment.polarity
+            sentiment_label = get_sentiment_label(sentiment_score)
+            aspect_sentiments[aspect].append(sentiment_label)
+
+    # Aggregate aspect-level sentiment
+    aspect_summary = []
+    for aspect, sentiments in aspect_sentiments.items():
+        pos = sentiments.count("positive")
+        neg = sentiments.count("negative")
+        neu = sentiments.count("neutral")
+        total = pos + neg + neu
+        dominant = max(["positive", "neutral", "negative"], key=lambda s: sentiments.count(s))
+        aspect_summary.append({
+            "Aspect": aspect,
+            "Positive": pos,
+            "Neutral": neu,
+            "Negative": neg,
+            "Total": total,
+            "Dominant Sentiment": dominant
+        })
+
+    return pd.DataFrame(aspect_summary).sort_values("Total", ascending=False)
+
 
 # ======================
 # Scraper
@@ -98,13 +139,13 @@ def scrape_trustpilot(domain):
 
     return pd.DataFrame(all_reviews)
 
+
 # ======================
 # STREAMLIT UI
 # ======================
-st.title("💬 Trustpilot Review Sentiment Analyzer")
-st.write("Enter a domain (e.g. `facebook.com`, `www.amazon.com`) to scrape and analyze recent Trustpilot reviews in real time.")
+st.title("💬 Trustpilot Aspect-Based Sentiment Analyzer (ABSA)")
+st.write("Enter a domain (e.g. `facebook.com`, `www.amazon.com`) to scrape and analyze reviews with Aspect-Based Sentiment Analysis (ABSA).")
 
-# Input box
 domain = st.text_input("🌐 Enter website domain:", "www.facebook.com")
 
 if st.button("🚀 Analyze"):
@@ -115,51 +156,43 @@ if st.button("🚀 Analyze"):
         st.error("⚠️ No reviews found — please check the URL or structure.")
     else:
         st.success(f"✅ Scraped {len(df_raw)} reviews successfully!")
-
         st.subheader("📄 Raw Scraped Data")
         st.dataframe(df_raw)
 
-        with st.spinner("🔍 Performing sentiment and aspect analysis..."):
-            df_analyzed = df_raw.copy()
-            df_analyzed[["sentiment", "score"]] = df_analyzed["review"].apply(
-                lambda text: pd.Series(get_sentiment(text))
-            )
-            df_analyzed["aspects"] = df_analyzed["review"].apply(extract_aspects)
+        with st.spinner("🔍 Extracting aspects and analyzing opinions..."):
+            aspect_df = analyze_aspects(df_raw)
 
-        st.subheader("📊 After Sentiment Analysis")
-        st.dataframe(df_analyzed)
+        st.subheader("🔍 Aspect-Based Sentiment Results")
+        st.dataframe(aspect_df)
 
         # Sentiment distribution
-        st.subheader("📈 Sentiment Distribution")
-        fig, ax = plt.subplots(figsize=(6, 4))
-        df_analyzed["sentiment"].value_counts().plot(kind="bar", ax=ax, color=["green", "red", "gray"])
-        ax.set_xlabel("Sentiment")
-        ax.set_ylabel("Count")
-        ax.set_title("Distribution of Sentiments")
+        st.subheader("📊 Sentiment Distribution")
+        sentiment_counts = pd.Series(sum(aspect_df[["Positive", "Neutral", "Negative"]].values.tolist(), []))
+        fig, ax = plt.subplots(figsize=(5, 5))
+        labels = ["Positive", "Neutral", "Negative"]
+        sizes = [
+            aspect_df["Positive"].sum(),
+            aspect_df["Neutral"].sum(),
+            aspect_df["Negative"].sum()
+        ]
+        ax.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90, wedgeprops={'edgecolor': 'white'})
+        ax.set_title("Overall Sentiment Distribution")
         st.pyplot(fig)
 
-        # Aspect frequency
-        all_nouns = sum(df_analyzed["aspects"], [])
-        common_aspects = Counter(all_nouns).most_common(10)
-        absa_df = pd.DataFrame(common_aspects, columns=["Aspect", "Frequency"])
-
-        st.subheader("🔍 Top 10 Most Frequent Aspects")
-        st.dataframe(absa_df)
-
-        # Final summary
-        pos = (df_analyzed["sentiment"] == "positive").sum()
-        neg = (df_analyzed["sentiment"] == "negative").sum()
-        neu = (df_analyzed["sentiment"] == "neutral").sum()
-        total = pos + neg + neu
-        final_score = (pos - neg) / total if total > 0 else 0
+        # Overall sentiment (dramatic)
+        pos_total = aspect_df["Positive"].sum()
+        neg_total = aspect_df["Negative"].sum()
+        neu_total = aspect_df["Neutral"].sum()
+        total = pos_total + neg_total + neu_total
+        final_score = (pos_total - neg_total) / total if total else 0
         overall = "positive" if final_score > 0.05 else "negative" if final_score < -0.05 else "neutral"
 
-        st.markdown(f"""
-        ### 🧾 Final Summary
-        - 👍 Positive Reviews: **{pos}**
-        - 👎 Negative Reviews: **{neg}**
-        - 😐 Neutral Reviews: **{neu}**
-        - 🌟 **Overall Sentiment:** `{overall.upper()}`  
-        - 📊 **Sentiment Score:** `{final_score:.2f}`
-        """)
+        color = {"positive": "#4CAF50", "negative": "#E74C3C", "neutral": "#95A5A6"}[overall]
+        emoji = {"positive": "😊", "negative": "😞", "neutral": "😐"}[overall]
 
+        st.markdown(f"""
+        <div style="text-align:center; padding:20px; border-radius:15px; background-color:{color}; color:white; font-size:28px;">
+            <b>🌟 OVERALL SENTIMENT: {overall.upper()} {emoji}</b><br>
+            <span style="font-size:18px;">(Score: {final_score:.2f})</span>
+        </div>
+        """, unsafe_allow_html=True)
