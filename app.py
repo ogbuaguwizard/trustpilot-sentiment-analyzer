@@ -190,72 +190,6 @@ st.markdown("""
         font-size: 1rem !important;
     }
 
-    /* Form-specific: render input + button inline and visually connected */
-    /* Button is a fixed width; input takes the remaining space */
-    .stForm .stTextInput {
-        display: inline-block !important;
-        vertical-align: middle !important;
-        margin: 0 !important;
-        width: calc(100% - 120px) !important;
-        max-width: calc(100% - 120px) !important;
-    }
-
-    .stForm .stTextInput input {
-        border-top-left-radius: 8px !important;
-        border-bottom-left-radius: 8px !important;
-        border-top-right-radius: 0 !important;
-        border-bottom-right-radius: 0 !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-    }
-
-    .stForm .stButton {
-        display: inline-block !important;
-        vertical-align: middle !important;
-        margin: 0 !important;
-        width: 120px !important;
-        max-width: 120px !important;
-    }
-
-    .stForm .stButton button {
-        width: 100% !important;
-        height: 100% !important;
-        border-top-left-radius: 0 !important;
-        border-bottom-left-radius: 0 !important;
-        border-top-right-radius: 8px !important;
-        border-bottom-right-radius: 8px !important;
-        padding: 0.5rem 0.75rem !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%) !important;
-        color: white !important;
-        box-sizing: border-box !important;
-    }
-
-    /* Add send SVG before the button text (visible on larger screens) */
-    .stForm .stButton button::before {
-        content: "";
-        display: inline-block;
-        width: 18px;
-        height: 18px;
-        margin-right: 8px;
-        vertical-align: middle;
-        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23ffffff' d='M2 21l21-9L2 3v7l15 2-15 2z'/></svg>");
-        background-size: contain;
-        background-repeat: no-repeat;
-    }
-
-    /* On small screens swap to compact mode: button shrinks and only shows the svg */
-    @media (max-width: 420px) {
-        .stForm .stTextInput { width: calc(100% - 48px) !important; max-width: calc(100% - 48px) !important; }
-        .stForm .stButton { width: 48px !important; max-width: 48px !important; }
-        /* hide button children text nodes (Streamlit may wrap text in div/span) */
-        .stForm .stButton button > div, .stForm .stButton button > span { display: none !important; }
-        /* keep the ::before svg visible */
-        .stForm .stButton button::before { margin-right: 0 !important; }
-    }
-
     /* Success/Error Messages */
     .stAlert {
         border-radius: 8px !important;
@@ -636,20 +570,19 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-with st.form(key='domain_form'):
-    # create columns inside the form to ensure the submit button is inside the form
-    fcol1, fcol2 = st.columns([3, 1])
-    with fcol1:
-        domain = st.text_input(
-            "**Enter Trustpilot Domain:**", 
-            "www.facebook.com",
-            placeholder="Enter Trustpilot domain (e.g., www.facebook.com)",
-            help="Enter the domain name as it appears on Trustpilot (e.g., 'www.facebook.com')",
-            label_visibility="collapsed"
-        )
-    with fcol2:
-        st.markdown("<br>", unsafe_allow_html=True)
-        analyze_clicked = st.form_submit_button(label="Send")
+col1, col2 = st.columns([3, 1])
+with col1:
+    domain = st.text_input(
+        "**Enter Trustpilot Domain:**", 
+        "www.facebook.com",
+        placeholder="Enter Trustpilot domain (e.g., www.facebook.com)",
+        help="Enter the domain name as it appears on Trustpilot (e.g., 'www.facebook.com')",
+        label_visibility="collapsed"
+    )
+
+with col2:
+    st.markdown("<br>", unsafe_allow_html=True)
+    analyze_clicked = st.button("🚀 **Start Analysis**", use_container_width=True)
 
 st.markdown("""
 <small class="text-muted-modern">
