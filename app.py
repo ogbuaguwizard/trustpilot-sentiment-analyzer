@@ -190,19 +190,47 @@ st.markdown("""
         font-size: 1rem !important;
     }
 
-    /* Form-specific: make input + button look like one connected control */
+    /* Form-specific: render input + button inline and visually connected */
+    /* Button is a fixed width; input takes the remaining space */
+    .stForm .stTextInput {
+        display: inline-block !important;
+        vertical-align: middle !important;
+        margin: 0 !important;
+        width: calc(100% - 120px) !important;
+        max-width: calc(100% - 120px) !important;
+    }
+
     .stForm .stTextInput input {
+        border-top-left-radius: 8px !important;
+        border-bottom-left-radius: 8px !important;
         border-top-right-radius: 0 !important;
         border-bottom-right-radius: 0 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    .stForm .stButton {
+        display: inline-block !important;
+        vertical-align: middle !important;
+        margin: 0 !important;
+        width: 120px !important;
+        max-width: 120px !important;
     }
 
     .stForm .stButton button {
+        width: 100% !important;
+        height: 100% !important;
         border-top-left-radius: 0 !important;
         border-bottom-left-radius: 0 !important;
-        padding: 0.6rem 1rem !important;
-        display: flex !important;
+        border-top-right-radius: 8px !important;
+        border-bottom-right-radius: 8px !important;
+        padding: 0.5rem 0.75rem !important;
+        display: inline-flex !important;
         align-items: center !important;
         justify-content: center !important;
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%) !important;
+        color: white !important;
+        box-sizing: border-box !important;
     }
 
     /* Add send SVG before the button text (visible on larger screens) */
@@ -213,16 +241,19 @@ st.markdown("""
         height: 18px;
         margin-right: 8px;
         vertical-align: middle;
-        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23f0f6fc' d='M2 21l21-9L2 3v7l15 2-15 2z'/></svg>");
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23ffffff' d='M2 21l21-9L2 3v7l15 2-15 2z'/></svg>");
         background-size: contain;
         background-repeat: no-repeat;
     }
 
-    /* On small screens show only the SVG inside the button (hide text) */
+    /* On small screens swap to compact mode: button shrinks and only shows the svg */
     @media (max-width: 420px) {
+        .stForm .stTextInput { width: calc(100% - 48px) !important; max-width: calc(100% - 48px) !important; }
+        .stForm .stButton { width: 48px !important; max-width: 48px !important; }
+        /* hide button children text nodes (Streamlit may wrap text in div/span) */
         .stForm .stButton button > div, .stForm .stButton button > span { display: none !important; }
-        .stForm .stButton button { padding-left: 10px !important; padding-right: 10px !important; }
-        .stForm .stTextInput input { border-radius: 8px !important; }
+        /* keep the ::before svg visible */
+        .stForm .stButton button::before { margin-right: 0 !important; }
     }
 
     /* Success/Error Messages */
@@ -618,7 +649,7 @@ with st.form(key='domain_form'):
         )
     with fcol2:
         st.markdown("<br>", unsafe_allow_html=True)
-        analyze_clicked = st.form_submit_button(label="Send", use_container_width=True)
+        analyze_clicked = st.form_submit_button(label="Send")
 
 st.markdown("""
 <small class="text-muted-modern">
