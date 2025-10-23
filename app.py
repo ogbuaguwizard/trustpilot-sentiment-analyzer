@@ -605,9 +605,10 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-col1, col2 = st.columns([3, 1])
-with col1:
-    with st.form(key='domain_form'):
+with st.form(key='domain_form'):
+    # create columns inside the form to ensure the submit button is inside the form
+    fcol1, fcol2 = st.columns([3, 1])
+    with fcol1:
         domain = st.text_input(
             "**Enter Trustpilot Domain:**", 
             "www.facebook.com",
@@ -615,11 +616,9 @@ with col1:
             help="Enter the domain name as it appears on Trustpilot (e.g., 'www.facebook.com')",
             label_visibility="collapsed"
         )
-        # Place button in the adjacent column but inside the same form layout
-        with col2:
-            st.markdown("<br>", unsafe_allow_html=True)
-            # Using form submit button so input + button behave as a unit
-            analyze_clicked = st.form_submit_button(label="Send", use_container_width=True)
+    with fcol2:
+        st.markdown("<br>", unsafe_allow_html=True)
+        analyze_clicked = st.form_submit_button(label="Send", use_container_width=True)
 
 st.markdown("""
 <small class="text-muted-modern">
