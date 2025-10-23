@@ -759,7 +759,7 @@ if 'aspect_df' in st.session_state:
         if not pairs:
             st.markdown('<small style="color: #8b949e;"><i class="bi bi-info-circle me-1"></i>No aspect-opinion pairs detected</small>', unsafe_allow_html=True)
         else:
-            st.markdown("<div style='margin-top: 0.5rem;'><strong style='color: #8b949e;'><i class="bi bi-tags me-1"></i>Detected Aspects & Opinions:</strong></div>", unsafe_allow_html=True)
+            st.markdown('<div style="margin-top: 0.5rem;"><strong style="color: #8b949e;"><i class="bi bi-tags me-1"></i>Detected Aspects & Opinions:</strong></div>', unsafe_allow_html=True)
             
             # Create aspect-opinion pairs with colored sentiment tags
             aspect_html = []
