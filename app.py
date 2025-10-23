@@ -509,18 +509,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Input Section - Always visible
-# st.markdown("""
-# <div class="modern-card">
-#     <div class="card-header">
-#         <h2 class="card-title">
-#             <i class="bi bi-search"></i>
-#             Analyze Trustpilot Reviews
-#         </h2>
-#     </div>
-#     <div class="card-body">
-# """, unsafe_allow_html=True)
-
 col1, col2 = st.columns([3, 1])
 with col1:
     domain = st.text_input(
