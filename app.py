@@ -75,7 +75,7 @@ st.markdown("""
         margin-bottom: 2rem;
     }
             
-    .responsive-header{
+    .responsive-header {
         display:flex;
         align-items:center;
         justify-content:space-between;
@@ -85,50 +85,12 @@ st.markdown("""
         box-sizing:border-box;
     }
 
-    /* Slightly smaller default for wide but not huge screens */
-    @media (min-width: 1200px) {
-        .responsive-header .brand { font-size:2.5rem; }
-        .responsive-header .subtitle { font-size:1.1rem; }
-    }
-
-    /* Tablet / small laptop */
-    @media (max-width: 1199px) and (min-width: 769px) {
-        .responsive-header .brand { font-size:2.1rem; }
-        .responsive-header .subtitle { font-size:1rem; }
-    }
-
-    /* Mobile: stack and reduce fonts */
-    @media (max-width: 768px) {
-        .responsive-header {
-            flex-direction:column;
-            align-items:flex-start;
-            gap:0.5rem;
-            padding:0.9rem;
-        }
-        .responsive-header .brand { font-size:1.6rem; line-height:1.0; }
-        .responsive-header .subtitle { font-size:0.95rem; color:var(--text-secondary); }
-        .responsive-header .header-right { width:100%; display:flex; justify-content:flex-end; }
-        .responsive-header .badge-modern { transform:translateY(-2px); }
-    }
-
-    /* Small phones: further reduce font sizes for readability */
-    @media (max-width: 420px) {
-        .responsive-header { padding:0.6rem; gap:0.4rem; }
-        .responsive-header .brand { font-size:1.25rem; }
-        .responsive-header .subtitle { font-size:0.82rem; }
-        .responsive-header .badge-modern { font-size:0.8rem; padding:0.35rem 0.7rem; }
-    }
-
     /* Ensure header text wraps gracefully */
     .responsive-header .brand, .responsive-header .subtitle {
         word-break:break-word;
         hyphens:auto;
     }
 
-    /* Reduce visual weight on very narrow layouts */
-    @media (max-width: 360px) {
-        .responsive-header .brand { white-space:normal; }
-    }
 
     .brand {
         font-family: var(--font-mono);
@@ -437,6 +399,50 @@ st.markdown("""
     .status-negative {
         color: var(--danger);
         font-weight: 600;
+    }
+
+    /* Responsive media queries (placed after base rules to ensure cascade precedence) */
+    @media (min-width: 1200px) {
+        .responsive-header .brand { 
+            font-size:2.5rem !important; }
+        .responsive-header .subtitle { font-size:1.1rem !important; }
+    }
+
+    /* Tablet / small laptop */
+    @media (max-width: 1199px) and (min-width: 769px) {
+        .responsive-header .brand { 
+            font-size:2.1rem !important; 
+        }
+        .responsive-header .subtitle { 
+            font-size:1rem !important; 
+        }
+    }
+
+    /* Mobile: stack and reduce fonts */
+    @media (max-width: 768px) {
+        .responsive-header {
+            flex-direction:column !important;
+            align-items:flex-start !important;
+            gap:0.5rem !important;
+            padding:0.9rem !important;
+        }
+        .responsive-header .brand { font-size:1.6rem !important; line-height:1.0 !important; }
+        .responsive-header .subtitle { font-size:0.95rem !important; color:var(--text-secondary) !important; }
+        .responsive-header .header-right { width:100% !important; display:flex !important; justify-content:flex-end !important; }
+        .responsive-header .badge-modern { transform:translateY(-2px) !important; }
+    }
+
+    /* Small phones: further reduce font sizes for readability */
+    @media (max-width: 420px) {
+        .responsive-header { padding:0.6rem !important; gap:0.4rem !important; }
+        .responsive-header .brand { font-size:1.25rem !important; }
+        .responsive-header .subtitle { font-size:0.82rem !important; }
+        .responsive-header .badge-modern { font-size:0.8rem !important; padding:0.35rem 0.7rem !important; }
+    }
+
+    /* Reduce visual weight on very narrow layouts */
+    @media (max-width: 360px) {
+        .responsive-header .brand { white-space:normal !important; }
     }
 </style>
 """, unsafe_allow_html=True)
