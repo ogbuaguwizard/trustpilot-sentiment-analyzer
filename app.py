@@ -53,7 +53,7 @@ st.markdown("""
 
     /* Make container wider */
     .main .block-container {
-        max-width: 95% !important;
+        max-width: 98% !important;
         padding-top: 2rem;
     }
 
@@ -496,32 +496,30 @@ st.markdown("""
 
 # Header Section
 st.markdown("""
-<div class="header-gradient">
-    <div class="row align-items-center">
-        <div class="col-md-8">
-            <h1 class="brand">
-                &lt;<span>Trustpilot ABSA</span>/&gt;
-            </h1>
-            <p class="subtitle">Advanced Aspect-Based Sentiment Analysis for Trustpilot Reviews</p>
-        </div>
-        <div class="col-md-4 text-md-end mt-3 mt-md-0">
-            <span class="badge-modern">v2.0</span>
-        </div>
+<div class="header-gradient" style="display: inline-flex; align-items: center; justify-content: space-between; width: 100%; gap: 1rem;">
+    <div style="display: inline-flex; flex-direction: column; gap: 0.25rem;">
+        <h1 class="brand" style="margin:0; display:inline-block;">
+            &lt;<span>Trustpilot ABSA</span>/&gt;
+        </h1>
+        <p class="subtitle" style="margin:0;">Advanced Aspect-Based Sentiment Analysis for Trustpilot Reviews</p>
+    </div>
+    <div style="display: inline-flex; align-items: center; gap: 0.5rem;">
+        <span class="badge-modern">v1.0</span>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
 # Input Section - Always visible
-st.markdown("""
-<div class="modern-card">
-    <div class="card-header">
-        <h2 class="card-title">
-            <i class="bi bi-search"></i>
-            Analyze Trustpilot Reviews
-        </h2>
-    </div>
-    <div class="card-body">
-""", unsafe_allow_html=True)
+# st.markdown("""
+# <div class="modern-card">
+#     <div class="card-header">
+#         <h2 class="card-title">
+#             <i class="bi bi-search"></i>
+#             Analyze Trustpilot Reviews
+#         </h2>
+#     </div>
+#     <div class="card-body">
+# """, unsafe_allow_html=True)
 
 col1, col2 = st.columns([3, 1])
 with col1:
