@@ -15,7 +15,7 @@ import random
 st.set_page_config(
     page_title="Trustpilot ABSA Analyzer", 
     page_icon="💬", 
-    layout="centered",
+    layout="wide",  # Changed to wide for more width
     initial_sidebar_state="collapsed"
 )
 
@@ -49,6 +49,12 @@ st.markdown("""
         color: var(--text-primary);
         font-family: var(--font-primary);
         line-height: 1.6;
+    }
+
+    /* Make container wider */
+    .main .block-container {
+        max-width: 95% !important;
+        padding-top: 2rem;
     }
 
     /* GitHub Corner Style */
@@ -362,11 +368,6 @@ st.markdown("""
         font-family: var(--font-mono);
     }
 
-    /* Collapsible Section */
-    .collapsible-section {
-        margin-bottom: 1.5rem;
-    }
-
     /* Status Indicators */
     .status-positive {
         color: var(--success);
@@ -510,7 +511,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Input Section
+# Input Section - Always visible
 st.markdown("""
 <div class="modern-card">
     <div class="card-header">
@@ -544,12 +545,20 @@ st.markdown("""
 
 st.markdown("</div></div>", unsafe_allow_html=True)
 
-# Progress Section (initially hidden)
-progress_section = st.empty()
+# Initialize session state
+if 'analysis_complete' not in st.session_state:
+    st.session_state.analysis_complete = False
+if 'show_progress' not in st.session_state:
+    st.session_state.show_progress = False
 
 # Analysis Section
-if analyze_clicked:
-    with progress_section.container():
+if analyze_clicked and not st.session_state.analysis_complete:
+    st.session_state.show_progress = True
+    st.session_state.analysis_complete = False
+
+# Show progress section if analysis is in progress
+if st.session_state.show_progress:
+    with st.container():
         st.markdown("""
         <div class="modern-card">
             <div class="card-header">
@@ -565,82 +574,82 @@ if analyze_clicked:
         status_text = st.empty()
         
         # Simulate progress updates
-        for percent_complete in range(0, 101, 20):
+        for percent_complete in range(0, 101, 10):
             if percent_complete == 0:
                 status_text.text("🔄 Starting analysis...")
-            elif percent_complete == 20:
+            elif percent_complete == 10:
                 status_text.text("🌐 Connecting to Trustpilot...")
-            elif percent_complete == 40:
+            elif percent_complete == 20:
                 status_text.text("📄 Scraping reviews...")
-            elif percent_complete == 60:
+            elif percent_complete == 40:
+                # Actual scraping happens here
+                with st.spinner(f"🔍 **Scraping reviews from {domain}...**"):
+                    df = scrape_trustpilot(domain)
                 status_text.text("🔍 Analyzing aspects and sentiment...")
-            elif percent_complete == 80:
+            elif percent_complete == 70:
+                # Actual analysis happens here
+                if not df.empty:
+                    with st.spinner("🔍 **Analyzing aspects and sentiments...**"):
+                        aspect_df, aspect_table = analyze_aspects(df)
                 status_text.text("📊 Generating visualizations...")
+            elif percent_complete == 90:
+                status_text.text("🎨 Finalizing results...")
             elif percent_complete == 100:
                 status_text.text("✅ Analysis complete!")
             
             progress_bar.progress(percent_complete)
-            time.sleep(0.5)
+            time.sleep(0.3)  # Reduced sleep time for faster progress
 
         st.markdown("</div></div>", unsafe_allow_html=True)
 
-    with st.spinner(f"🔍 **Scraping reviews from {domain}...**"):
-        df = scrape_trustpilot(domain)
-
-    if df.empty:
+    # Store results in session state
+    if not df.empty:
+        st.session_state.df = df
+        st.session_state.aspect_df = aspect_df
+        st.session_state.aspect_table = aspect_table
+        
+        # Calculate sentiment score
+        pos, neu, neg = aspect_df["Positive"].sum(), aspect_df["Neutral"].sum(), aspect_df["Negative"].sum()
+        total = pos + neu + neg
+        sentiment_score = (pos - neg) / total if total else 0
+        st.session_state.sentiment_score = sentiment_score
+        
+        st.session_state.show_progress = False
+        st.session_state.analysis_complete = True
+        
+        # Use rerun to refresh the page and show results
+        st.rerun()
+    else:
         st.error("""
         ⚠️ **No reviews found!** 
         - Please check the domain name
         - Ensure the company has Trustpilot reviews
         - Try a different domain
         """)
-    else:
-        # Clear progress section
-        progress_section.empty()
-        
-        # Success Alert
-        st.success(f"✅ **Successfully collected {len(df)} reviews from {domain}**")
-        
-        # Metrics Cards
-        col1, col2, col3, col4 = st.columns(4)
-        
-        with col1:
-            st.metric("Total Reviews", len(df))
-        with col2:
-            avg_rating = pd.to_numeric(df['rating'], errors='coerce').mean()
-            st.metric("Average Rating", f"{avg_rating:.1f} ⭐" if not pd.isna(avg_rating) else "N/A")
-        with col3:
-            st.metric("Aspects Found", "Calculating...")
-        with col4:
-            st.metric("Sentiment Score", "0.0")
+        st.session_state.show_progress = False
 
-        # Store initial data
-        st.session_state.df = df
-
-        # Aspect Analysis
-        with st.spinner("🔍 **Analyzing aspects and sentiments...**"):
-            aspect_df, aspect_table = analyze_aspects(df)
-
-        # Update metrics
-        with col3:
-            st.metric("Aspects Found", len(aspect_df))
-        with col4:
-            pos, neu, neg = aspect_df["Positive"].sum(), aspect_df["Neutral"].sum(), aspect_df["Negative"].sum()
-            total = pos + neu + neg
-            sentiment_score = (pos - neg) / total if total else 0
-            st.metric("Sentiment Score", f"{sentiment_score:.3f}")
-
-        # Store in session state
-        st.session_state.aspect_df = aspect_df
-        st.session_state.aspect_table = aspect_table
-        st.session_state.sentiment_score = sentiment_score
-
-# Display Results if available
-if 'aspect_df' in st.session_state:
+# Display Results if analysis is complete
+if st.session_state.analysis_complete and 'aspect_df' in st.session_state:
     df = st.session_state.df
     aspect_df = st.session_state.aspect_df
     aspect_table = st.session_state.aspect_table
     sentiment_score = st.session_state.sentiment_score
+
+    # Success Alert
+    st.success(f"✅ **Successfully collected {len(df)} reviews from {domain}**")
+    
+    # Metrics Cards - Calculate once and display
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("Total Reviews", len(df))
+    with col2:
+        avg_rating = pd.to_numeric(df['rating'], errors='coerce').mean()
+        st.metric("Average Rating", f"{avg_rating:.1f} ⭐" if not pd.isna(avg_rating) else "N/A")
+    with col3:
+        st.metric("Aspects Found", len(aspect_df))
+    with col4:
+        st.metric("Sentiment Score", f"{sentiment_score:.3f}")
 
     # Charts Section
     col1, col2 = st.columns([2, 1])
@@ -655,7 +664,7 @@ if 'aspect_df' in st.session_state:
         """, unsafe_allow_html=True)
         
         # Sentiment Distribution Bar Chart
-        fig, ax = plt.subplots(figsize=(10, 6))
+        fig, ax = plt.subplots(figsize=(12, 8))  # Larger figure for wider layout
         fig.patch.set_facecolor('#0d1117')
         ax.set_facecolor('#0d1117')
         
@@ -668,17 +677,17 @@ if 'aspect_df' in st.session_state:
         ax.barh(aspects, neu, left=pos, label='Neutral', color='#d29922')
         ax.barh(aspects, neg, left=pos+neu, label='Negative', color='#f85149')
         
-        ax.set_xlabel('Count', color='#f0f6fc')
-        ax.set_ylabel('Aspects', color='#f0f6fc')
-        ax.tick_params(colors='#8b949e')
-        ax.legend(facecolor='#161b22', edgecolor='#30363d', labelcolor='#f0f6fc')
+        ax.set_xlabel('Count', color='#f0f6fc', fontsize=12)
+        ax.set_ylabel('Aspects', color='#f0f6fc', fontsize=12)
+        ax.tick_params(colors='#8b949e', labelsize=10)
+        ax.legend(facecolor='#161b22', edgecolor='#30363d', labelcolor='#f0f6fc', fontsize=10)
         ax.spines['bottom'].set_color('#30363d')
         ax.spines['top'].set_color('#30363d')
         ax.spines['right'].set_color('#30363d')
         ax.spines['left'].set_color('#30363d')
         
         plt.tight_layout()
-        st.pyplot(fig)
+        st.pyplot(fig, use_container_width=True)  # Use container width
         st.markdown("</div>", unsafe_allow_html=True)
 
     with col2:
@@ -691,7 +700,7 @@ if 'aspect_df' in st.session_state:
         """, unsafe_allow_html=True)
         
         # Overall Sentiment Pie Chart
-        fig, ax = plt.subplots(figsize=(6, 6))
+        fig, ax = plt.subplots(figsize=(8, 8))
         fig.patch.set_facecolor('#0d1117')
         ax.set_facecolor('#0d1117')
         
@@ -701,11 +710,11 @@ if 'aspect_df' in st.session_state:
         
         wedges, texts, autotexts = ax.pie(
             sizes, labels=labels, autopct="%1.1f%%", startangle=90,
-            colors=colors, textprops={'color': '#f0f6fc', 'fontsize': 10}
+            colors=colors, textprops={'color': '#f0f6fc', 'fontsize': 11}
         )
         
-        plt.setp(autotexts, size=10, weight="bold", color='#0d1117')
-        st.pyplot(fig)
+        plt.setp(autotexts, size=11, weight="bold", color='#0d1117')
+        st.pyplot(fig, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
     # Aspect Details Table (Collapsible)
@@ -720,7 +729,7 @@ if 'aspect_df' in st.session_state:
     with st.expander("📄 **Raw Scraped Data**", expanded=False):
         st.dataframe(df, use_container_width=True)
 
-    # Review Analysis Section
+    # Review Analysis Section - Only show after analysis
     st.markdown("""
     <div class="modern-card">
         <div class="card-header">
