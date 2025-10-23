@@ -585,9 +585,8 @@ st.markdown("---")
 st.markdown("""
 <div style="text-align: center; color: #8b949e; padding: 2rem 0;">
     <p>
-        Made with ❤️ using <strong style="color: #58a6ff;">Streamlit</strong> • 
-        GitHub Dark Theme • ABSA Technology
+        Made with ❤️ by <strong style="color: #58a6ff;">Ogbuaguwizard</strong>
     </p>
-    <small>© 2024 Trustpilot ABSA Analyzer • MIT License</small>
+    <small>© 2025 Trustpilot ABSA Analyzer • MIT License</small>
 </div>
 """, unsafe_allow_html=True)
