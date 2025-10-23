@@ -190,6 +190,41 @@ st.markdown("""
         font-size: 1rem !important;
     }
 
+    /* Form-specific: make input + button look like one connected control */
+    .stForm .stTextInput input {
+        border-top-right-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
+    }
+
+    .stForm .stButton button {
+        border-top-left-radius: 0 !important;
+        border-bottom-left-radius: 0 !important;
+        padding: 0.6rem 1rem !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    /* Add send SVG before the button text (visible on larger screens) */
+    .stForm .stButton button::before {
+        content: "";
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        margin-right: 8px;
+        vertical-align: middle;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23f0f6fc' d='M2 21l21-9L2 3v7l15 2-15 2z'/></svg>");
+        background-size: contain;
+        background-repeat: no-repeat;
+    }
+
+    /* On small screens show only the SVG inside the button (hide text) */
+    @media (max-width: 420px) {
+        .stForm .stButton button > div, .stForm .stButton button > span { display: none !important; }
+        .stForm .stButton button { padding-left: 10px !important; padding-right: 10px !important; }
+        .stForm .stTextInput input { border-radius: 8px !important; }
+    }
+
     /* Success/Error Messages */
     .stAlert {
         border-radius: 8px !important;
@@ -572,17 +607,19 @@ st.markdown("""
 
 col1, col2 = st.columns([3, 1])
 with col1:
-    domain = st.text_input(
-        "**Enter Trustpilot Domain:**", 
-        "www.facebook.com",
-        placeholder="Enter Trustpilot domain (e.g., www.facebook.com)",
-        help="Enter the domain name as it appears on Trustpilot (e.g., 'www.facebook.com')",
-        label_visibility="collapsed"
-    )
-
-with col2:
-    st.markdown("<br>", unsafe_allow_html=True)
-    analyze_clicked = st.button("🚀 **Start Analysis**", use_container_width=True)
+    with st.form(key='domain_form'):
+        domain = st.text_input(
+            "**Enter Trustpilot Domain:**", 
+            "www.facebook.com",
+            placeholder="Enter Trustpilot domain (e.g., www.facebook.com)",
+            help="Enter the domain name as it appears on Trustpilot (e.g., 'www.facebook.com')",
+            label_visibility="collapsed"
+        )
+        # Place button in the adjacent column but inside the same form layout
+        with col2:
+            st.markdown("<br>", unsafe_allow_html=True)
+            # Using form submit button so input + button behave as a unit
+            analyze_clicked = st.form_submit_button(label="Send", use_container_width=True)
 
 st.markdown("""
 <small class="text-muted-modern">
